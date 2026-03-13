@@ -26,7 +26,7 @@ else
 PROFILE_FLAG := --profile $(BUILD_PROFILE)
 endif
 
-.PHONY: help build bench bench-quick test
+.PHONY: help build bench bench-quick fmt fmt-check check-all clippy test
 
 help:
 	@echo "\033[1;4mGetting Started:\033[0m"
@@ -51,6 +51,18 @@ help:
 
 build: ## &build Build the full workspace for $(BUILD_PROFILE)
 	$(CARGO) build $(PROFILE_FLAG) --workspace $(ARGS)
+
+fmt: ## &test Format the workspace
+	CBOR_DB_SCHEMA="$(CBOR_DB_SCHEMA)" $(CARGO) fmt --all
+
+fmt-check: ## &test Check workspace formatting
+	CBOR_DB_SCHEMA="$(CBOR_DB_SCHEMA)" $(CARGO) fmt --all -- --check
+
+check-all: ## &test Compile-check the full workspace
+	CBOR_DB_SCHEMA="$(CBOR_DB_SCHEMA)" $(CARGO) check --workspace $(ARGS)
+
+clippy: ## &test Run clippy across the workspace
+	CBOR_DB_SCHEMA="$(CBOR_DB_SCHEMA)" $(CARGO) clippy --workspace --all-targets -- -D warnings
 
 bench: ## &build Run backend benchmarks and refresh benchmark docs
 	mkdir -p "$(BENCH_OUT_DIR)"
