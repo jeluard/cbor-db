@@ -1,0 +1,32 @@
+[workspace]
+members = [
+    "crates/benchmarks",
+    "crates/dsl",
+    "crates/store",
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+
+[workspace.dependencies]
+cddl = "0.10.3"
+fjall = "3.1.0"
+minicbor = { version = "2.2.1", features = ["std", "alloc"] }
+proc-macro2 = "1"
+quote = "1"
+rocksdb = "0.24"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sled = "0.34"
+store = { path = "crates/store" }
+surrealkv = "0.21.0"
+syn = { version = "2", features = ["full"] }
+sysinfo = "0.38.4"
+tempfile = "3"
+tidehunter = { git = "https://github.com/MystenLabs/tidehunter", rev = "da806c0bcf219e8eab6ed60c9ca00cf0131a5115", package = "tidehunter" }
+tokio = { version = "1", features = ["rt", "sync"] }
+trybuild = "1"
+turso = { version = "0.5.1-pre.1", default-features = false }
+dsl = { path = "crates/dsl" }
+

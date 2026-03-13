@@ -1,0 +1,50 @@
+{
+  "backend": "fjall",
+  "kind": "embedded Rust LSM",
+  "on_disk_bytes": 67112415,
+  "memory": {
+    "rss_before_bytes": 14745600,
+    "rss_peak_bytes": 20004864,
+    "rss_after_bytes": 20004864
+  },
+  "insert": {
+    "operations": 4000,
+    "elapsed_ms": 7,
+    "elapsed_us": 7186,
+    "ops_per_sec": 556582.9922987003
+  },
+  "full_read": {
+    "operations": 4000,
+    "elapsed_ms": 2,
+    "elapsed_us": 2363,
+    "ops_per_sec": 1692673.8957947632
+  },
+  "partial_get_static": {
+    "operations": 4000,
+    "elapsed_ms": 2,
+    "elapsed_us": 2094,
+    "ops_per_sec": 1909346.1539563083
+  },
+  "full_update_static": {
+    "operations": 4000,
+    "elapsed_ms": 12,
+    "elapsed_us": 12931,
+    "ops_per_sec": 309332.1727190213
+  },
+  "partial_update_static": {
+    "operations": 4000,
+    "elapsed_ms": 11,
+    "elapsed_us": 11398,
+    "ops_per_sec": 350910.5602673096
+  },
+  "delete": {
+    "operations": 4000,
+    "elapsed_ms": 7,
+    "elapsed_us": 7981,
+    "ops_per_sec": 501153.71850421146
+  },
+  "notes": [
+    "Pure Rust",
+    "Single keyspace used for fair comparison"
+  ]
+}

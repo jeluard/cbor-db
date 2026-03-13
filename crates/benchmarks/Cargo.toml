@@ -1,0 +1,12 @@
+[package]
+name = "cbordb-benchmarks"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dsl = { workspace = true }
+minicbor = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+store = { workspace = true, features = ["rocksdb-backend", "fjall-backend", "surrealkv-backend", "tidehunter-backend", "turso-backend"] }
+sysinfo = { workspace = true }

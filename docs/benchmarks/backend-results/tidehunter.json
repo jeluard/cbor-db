@@ -1,0 +1,50 @@
+{
+  "backend": "tidehunter",
+  "kind": "embedded WAL/index engine",
+  "on_disk_bytes": 6292168,
+  "memory": {
+    "rss_before_bytes": 14761984,
+    "rss_peak_bytes": 29933568,
+    "rss_after_bytes": 27721728
+  },
+  "insert": {
+    "operations": 4000,
+    "elapsed_ms": 6,
+    "elapsed_us": 6035,
+    "ops_per_sec": 662791.106138705
+  },
+  "full_read": {
+    "operations": 4000,
+    "elapsed_ms": 2,
+    "elapsed_us": 2870,
+    "ops_per_sec": 1393606.8286734605
+  },
+  "partial_get_static": {
+    "operations": 4000,
+    "elapsed_ms": 2,
+    "elapsed_us": 2600,
+    "ops_per_sec": 1537943.961166915
+  },
+  "full_update_static": {
+    "operations": 4000,
+    "elapsed_ms": 9,
+    "elapsed_us": 9967,
+    "ops_per_sec": 401324.3704223939
+  },
+  "partial_update_static": {
+    "operations": 4000,
+    "elapsed_ms": 7,
+    "elapsed_us": 7334,
+    "ops_per_sec": 545355.3651447298
+  },
+  "delete": {
+    "operations": 4000,
+    "elapsed_ms": 3,
+    "elapsed_us": 3234,
+    "ops_per_sec": 1236794.513084822
+  },
+  "notes": [
+    "Git dependency pinned to upstream commit",
+    "Single key space with hashed indexing"
+  ]
+}

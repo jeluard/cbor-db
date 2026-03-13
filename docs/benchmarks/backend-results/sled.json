@@ -1,0 +1,49 @@
+{
+  "backend": "sled",
+  "kind": "embedded B+tree/log",
+  "on_disk_bytes": 3145790,
+  "memory": {
+    "rss_before_bytes": 14729216,
+    "rss_peak_bytes": 44138496,
+    "rss_after_bytes": 44122112
+  },
+  "insert": {
+    "operations": 4000,
+    "elapsed_ms": 8,
+    "elapsed_us": 8044,
+    "ops_per_sec": 497208.36150329455
+  },
+  "full_read": {
+    "operations": 4000,
+    "elapsed_ms": 2,
+    "elapsed_us": 2870,
+    "ops_per_sec": 1393627.221441791
+  },
+  "partial_get_static": {
+    "operations": 4000,
+    "elapsed_ms": 1,
+    "elapsed_us": 1760,
+    "ops_per_sec": 2272512.9334392324
+  },
+  "full_update_static": {
+    "operations": 4000,
+    "elapsed_ms": 8,
+    "elapsed_us": 8333,
+    "ops_per_sec": 480016.78138667723
+  },
+  "partial_update_static": {
+    "operations": 4000,
+    "elapsed_ms": 5,
+    "elapsed_us": 5607,
+    "ops_per_sec": 713356.821795619
+  },
+  "delete": {
+    "operations": 4000,
+    "elapsed_ms": 7,
+    "elapsed_us": 7152,
+    "ops_per_sec": 559277.5476350669
+  },
+  "notes": [
+    "Current production candidate in repo"
+  ]
+}

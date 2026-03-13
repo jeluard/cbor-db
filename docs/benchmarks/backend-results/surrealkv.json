@@ -1,0 +1,49 @@
+{
+  "backend": "surrealkv",
+  "kind": "embedded transactional LSM",
+  "on_disk_bytes": 808101,
+  "memory": {
+    "rss_before_bytes": 14761984,
+    "rss_peak_bytes": 226902016,
+    "rss_after_bytes": 226885632
+  },
+  "insert": {
+    "operations": 4000,
+    "elapsed_ms": 14,
+    "elapsed_us": 14147,
+    "ops_per_sec": 282737.9637565273
+  },
+  "full_read": {
+    "operations": 4000,
+    "elapsed_ms": 2,
+    "elapsed_us": 2035,
+    "ops_per_sec": 1965481.235796327
+  },
+  "partial_get_static": {
+    "operations": 4000,
+    "elapsed_ms": 1,
+    "elapsed_us": 1793,
+    "ops_per_sec": 2229912.9441986587
+  },
+  "full_update_static": {
+    "operations": 4000,
+    "elapsed_ms": 16,
+    "elapsed_us": 16548,
+    "ops_per_sec": 241710.09895007176
+  },
+  "partial_update_static": {
+    "operations": 4000,
+    "elapsed_ms": 14,
+    "elapsed_us": 14684,
+    "ops_per_sec": 272403.7808555168
+  },
+  "delete": {
+    "operations": 4000,
+    "elapsed_ms": 12,
+    "elapsed_us": 12544,
+    "ops_per_sec": 318855.3094391136
+  },
+  "notes": [
+    "Async commit API wrapped behind sync adapter"
+  ]
+}

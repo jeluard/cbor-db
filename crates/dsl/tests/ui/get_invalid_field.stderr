@@ -1,0 +1,7 @@
+error: Field 'missing_field' not found. Available fields: [pool, deposit, drep, rewards]
+ --> tests/ui/get_invalid_field.rs:7:13
+  |
+7 |     let _ = get!(store, b"row_static", b"row-001", missing_field);
+  |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: this error originates in the macro `get` (in Nightly builds, run with -Z macro-backtrace for more info)

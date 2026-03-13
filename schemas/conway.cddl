@@ -1,0 +1,53 @@
+block = 
+  [ header ]
+
+header = [header_body]
+
+header_body = 
+  [ block_number      : block_number
+  , slot              : slot        
+  , prev_hash         : hash32/ nil 
+  , protocol_version
+  ]
+
+block_number = uint .size 8
+
+slot = uint .size 8
+
+hash32 = bytes .size 32
+
+protocol_version = [major_protocol_version, uint]
+
+major_protocol_version = 0 .. 12
+
+row_static =
+  [ pool    : row_pool
+  , deposit : row_lovelace
+  , drep    : row_drep
+  , rewards : row_lovelace
+  ]
+
+row_dynamic =
+  [ pool    : row_pool / nil
+  , deposit : row_lovelace
+  , drep    : row_drep / nil
+  , rewards : row_lovelace
+  ]
+
+row_pool = [pool_id : row_pool_id, certificate_pointer : row_certificate_pointer]
+
+row_drep = [drep_id : row_drep_id, certificate_pointer : row_certificate_pointer]
+
+row_pool_id = bytes .size 28
+
+row_drep_id = bytes .size 28
+
+row_certificate_pointer =
+  [ slot       : row_index
+  , tx_index   : row_index
+  , cert_index : row_index
+  ]
+
+row_index = uint .size 8
+
+row_lovelace = uint .size 8

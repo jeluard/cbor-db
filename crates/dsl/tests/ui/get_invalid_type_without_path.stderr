@@ -1,0 +1,7 @@
+error: Type 'missing_type' not found in schema. Available types: ["block", "block_number", "hash32", "header", "header_body", "major_protocol_version", "protocol_version", "row_certificate_pointer", "row_drep", "row_drep_id", "row_dynamic", "row_index", "row_lovelace", "row_pool", "row_pool_id", "row_static", "slot"]
+ --> tests/ui/get_invalid_type_without_path.rs:7:13
+  |
+7 |     let _ = get!(store, b"missing_type", b"row-001");
+  |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: this error originates in the macro `get` (in Nightly builds, run with -Z macro-backtrace for more info)

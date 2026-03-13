@@ -1,0 +1,13 @@
+error: Field 'unknown_field' not found. Available fields: [pool_id, certificate_pointer]
+  --> tests/ui/update_invalid_nested_field.rs:7:13
+   |
+ 7 |       let _ = update!(
+   |  _____________^
+ 8 | |         store,
+ 9 | |         b"row_static",
+10 | |         b"row-001",
+...  |
+15 | |     );
+   | |_____^
+   |
+   = note: this error originates in the macro `update` (in Nightly builds, run with -Z macro-backtrace for more info)

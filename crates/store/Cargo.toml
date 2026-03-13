@@ -1,0 +1,26 @@
+[package]
+name = "store"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = []
+rocksdb-backend = ["dep:rocksdb"]
+fjall-backend = ["dep:fjall"]
+surrealkv-backend = ["dep:surrealkv", "dep:tokio"]
+tidehunter-backend = ["dep:tidehunter"]
+turso-backend = ["dep:turso", "dep:tokio"]
+
+[dependencies]
+sled = { workspace = true }
+serde = { workspace = true }
+minicbor = { workspace = true }
+rocksdb = { workspace = true, optional = true }
+fjall = { workspace = true, optional = true }
+surrealkv = { workspace = true, optional = true }
+tokio = { workspace = true, optional = true }
+tidehunter = { workspace = true, optional = true }
+turso = { workspace = true, optional = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }

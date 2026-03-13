@@ -1,0 +1,50 @@
+{
+  "backend": "memory",
+  "kind": "in-memory HashMap",
+  "on_disk_bytes": null,
+  "memory": {
+    "rss_before_bytes": 14729216,
+    "rss_peak_bytes": 19513344,
+    "rss_after_bytes": 19513344
+  },
+  "insert": {
+    "operations": 4000,
+    "elapsed_ms": 0,
+    "elapsed_us": 906,
+    "ops_per_sec": 4413997.66940923
+  },
+  "full_read": {
+    "operations": 4000,
+    "elapsed_ms": 1,
+    "elapsed_us": 1091,
+    "ops_per_sec": 3664681.6307833255
+  },
+  "partial_get_static": {
+    "operations": 4000,
+    "elapsed_ms": 0,
+    "elapsed_us": 846,
+    "ops_per_sec": 4728132.387706856
+  },
+  "full_update_static": {
+    "operations": 4000,
+    "elapsed_ms": 2,
+    "elapsed_us": 2723,
+    "ops_per_sec": 1468698.3660730678
+  },
+  "partial_update_static": {
+    "operations": 4000,
+    "elapsed_ms": 0,
+    "elapsed_us": 657,
+    "ops_per_sec": 6088280.0608828
+  },
+  "delete": {
+    "operations": 4000,
+    "elapsed_ms": 0,
+    "elapsed_us": 539,
+    "ops_per_sec": 7419429.63134709
+  },
+  "notes": [
+    "Baseline only",
+    "No persistence cost"
+  ]
+}

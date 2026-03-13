@@ -1,0 +1,7 @@
+error: Static navigation fails at 'rewards' (segment 1/1): field 'rewards' is a choice between [row_pool | nil] with variable sizes. Static offset to 'root': 0 bytes. Add ', dynamic = true' to enable hybrid navigation.
+ --> tests/ui/get_missing_dynamic_opt_in.rs:7:13
+  |
+7 |     let _ = get!(store, b"row_dynamic", b"row-001", rewards);
+  |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: this error originates in the macro `get` (in Nightly builds, run with -Z macro-backtrace for more info)
