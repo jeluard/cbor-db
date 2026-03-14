@@ -29,6 +29,7 @@ function main() {
 }
 
 function renderReadmeSnapshot(report) {
+  const bestOpsByMetric = computeBestOpsByMetric(report.results);
   let markdown = "";
 
   markdown += `Current benchmark snapshot (\`make bench\`, ${report.config.entries} \`Row\` values, ${report.config.key_size}-byte keys). Each backend is benchmarked in its own child process. The workload writes the full row, reads it back with full \`get!\`-equivalent retrieval into a Rust struct, reads only \`rewards\` through \`get!\`, updates \`rewards\` to 0 through either full deserialize/mutate/re-encode or direct CBOR rewrite, then deletes the entry. The table below shows the fixed-width \`row_static\` path-targeted variants, resident memory before the backend run, peak observed resident memory during the run, resident memory after the backend run, and the persisted raw store size after the baseline seeded workload.\n\n`;
@@ -36,7 +37,7 @@ function renderReadmeSnapshot(report) {
   markdown += "| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: |\n";
 
   for (const result of report.results) {
-    markdown += `| ${result.backend} | ${renderOps(result.insert.ops_per_sec)} | ${renderOps(result.full_read.ops_per_sec)} | ${renderOps(result.partial_get_static.ops_per_sec)} | ${renderOps(result.full_update_static.ops_per_sec)} | ${renderOps(result.partial_update_static.ops_per_sec)} | ${renderOps(result.delete.ops_per_sec)} | ${renderMibShort(result.memory.rss_before_bytes)} / ${renderMibShort(result.memory.rss_peak_bytes)} / ${renderMibShort(result.memory.rss_after_bytes)} | ${renderDiskUsage(result.on_disk_bytes)} |\n`;
+    markdown += `| ${result.backend} | ${renderBestOps(result.insert.ops_per_sec, bestOpsByMetric.insert)} | ${renderBestOps(result.full_read.ops_per_sec, bestOpsByMetric.full_read)} | ${renderBestOps(result.partial_get_static.ops_per_sec, bestOpsByMetric.partial_get_static)} | ${renderBestOps(result.full_update_static.ops_per_sec, bestOpsByMetric.full_update_static)} | ${renderBestOps(result.partial_update_static.ops_per_sec, bestOpsByMetric.partial_update_static)} | ${renderBestOps(result.delete.ops_per_sec, bestOpsByMetric.delete)} | ${renderMibShort(result.memory.rss_before_bytes)} / ${renderMibShort(result.memory.rss_peak_bytes)} / ${renderMibShort(result.memory.rss_after_bytes)} | ${renderDiskUsage(result.on_disk_bytes)} |\n`;
   }
 
   markdown += "\n### Backend Comparison Charts\n\n";
@@ -53,6 +54,23 @@ function renderReadmeSnapshot(report) {
   markdown += renderReadmeChart("Delete", report.results, (result) => result.delete.ops_per_sec);
 
   return markdown.trimEnd();
+}
+
+function computeBestOpsByMetric(results) {
+  const comparableResults = results.filter((result) => result.backend !== "memory");
+
+  return {
+    insert: bestMetricValue(comparableResults, (result) => result.insert.ops_per_sec),
+    full_read: bestMetricValue(comparableResults, (result) => result.full_read.ops_per_sec),
+    partial_get_static: bestMetricValue(comparableResults, (result) => result.partial_get_static.ops_per_sec),
+    full_update_static: bestMetricValue(comparableResults, (result) => result.full_update_static.ops_per_sec),
+    partial_update_static: bestMetricValue(comparableResults, (result) => result.partial_update_static.ops_per_sec),
+    delete: bestMetricValue(comparableResults, (result) => result.delete.ops_per_sec),
+  };
+}
+
+function bestMetricValue(results, metric) {
+  return results.reduce((current, result) => Math.max(current, metric(result)), 0);
 }
 
 function renderReadmeChart(title, results, metric) {
@@ -99,6 +117,11 @@ function renderOps(opsPerSec) {
     return `${Math.round(opsPerSec / 1_000)}k ops/s`;
   }
   return `${Math.round(opsPerSec)} ops/s`;
+}
+
+function renderBestOps(opsPerSec, bestOpsPerSec) {
+  const rendered = renderOps(opsPerSec);
+  return opsPerSec === bestOpsPerSec ? `**${rendered}**` : rendered;
 }
 
 main();

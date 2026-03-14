@@ -89,10 +89,10 @@ Current benchmark snapshot (`make bench`, 4000 `Row` values, 24-byte keys). Each
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: |
 | memory | 9.0M ops/s | 6.5M ops/s | 8.3M ops/s | 2.2M ops/s | 10.4M ops/s | 11.8M ops/s | 14.2 MiB / 19.5 MiB / 19.5 MiB | n/a |
 | rocksdb | 355k ops/s | 1.4M ops/s | 1.6M ops/s | 266k ops/s | 295k ops/s | 408k ops/s | 14.1 MiB / 19.6 MiB / 19.6 MiB | 814 KiB |
-| sled | 538k ops/s | 2.8M ops/s | 3.3M ops/s | 490k ops/s | 628k ops/s | 606k ops/s | 14.2 MiB / 41.6 MiB / 41.5 MiB | 3.1 MiB |
+| sled | 538k ops/s | **2.8M ops/s** | **3.3M ops/s** | **490k ops/s** | **628k ops/s** | 606k ops/s | 14.2 MiB / 41.6 MiB / 41.5 MiB | 3.1 MiB |
 | surrealkv | 254k ops/s | 2.1M ops/s | 2.3M ops/s | 243k ops/s | 264k ops/s | 320k ops/s | 14.2 MiB / 216.6 MiB / 216.6 MiB | 789 KiB |
 | fjall | 338k ops/s | 2.1M ops/s | 2.3M ops/s | 298k ops/s | 332k ops/s | 459k ops/s | 14.2 MiB / 19.3 MiB / 19.3 MiB | 64.0 MiB |
-| tidehunter | 708k ops/s | 1.6M ops/s | 1.7M ops/s | 403k ops/s | 535k ops/s | 1.2M ops/s | 14.3 MiB / 28.7 MiB / 26.6 MiB | 6.0 MiB |
+| tidehunter | **708k ops/s** | 1.6M ops/s | 1.7M ops/s | 403k ops/s | 535k ops/s | **1.2M ops/s** | 14.3 MiB / 28.7 MiB / 26.6 MiB | 6.0 MiB |
 | turso | 18k ops/s | 129k ops/s | 128k ops/s | 18k ops/s | 14k ops/s | 28k ops/s | 14.1 MiB / 21.5 MiB / 20.6 MiB | 4.9 MiB |
 
 ### Backend Comparison Charts
