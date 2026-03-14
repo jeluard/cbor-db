@@ -1,49 +1,45 @@
 {
   "backend": "surrealkv",
-  "kind": "embedded transactional LSM",
   "on_disk_bytes": 808101,
   "memory": {
-    "rss_before_bytes": 14761984,
-    "rss_peak_bytes": 226902016,
-    "rss_after_bytes": 226885632
+    "rss_before_bytes": 14925824,
+    "rss_peak_bytes": 227147776,
+    "rss_after_bytes": 227131392
   },
   "insert": {
     "operations": 4000,
-    "elapsed_ms": 14,
-    "elapsed_us": 14147,
-    "ops_per_sec": 282737.9637565273
+    "elapsed_ms": 15,
+    "elapsed_us": 15756,
+    "ops_per_sec": 253856.25795986134
   },
   "full_read": {
     "operations": 4000,
-    "elapsed_ms": 2,
-    "elapsed_us": 2035,
-    "ops_per_sec": 1965481.235796327
+    "elapsed_ms": 1,
+    "elapsed_us": 1911,
+    "ops_per_sec": 2092865.6133741324
   },
   "partial_get_static": {
     "operations": 4000,
     "elapsed_ms": 1,
-    "elapsed_us": 1793,
-    "ops_per_sec": 2229912.9441986587
+    "elapsed_us": 1716,
+    "ops_per_sec": 2330534.96928485
   },
   "full_update_static": {
     "operations": 4000,
     "elapsed_ms": 16,
-    "elapsed_us": 16548,
-    "ops_per_sec": 241710.09895007176
+    "elapsed_us": 16485,
+    "ops_per_sec": 242640.5675193026
   },
   "partial_update_static": {
     "operations": 4000,
-    "elapsed_ms": 14,
-    "elapsed_us": 14684,
-    "ops_per_sec": 272403.7808555168
+    "elapsed_ms": 15,
+    "elapsed_us": 15170,
+    "ops_per_sec": 263663.1948419991
   },
   "delete": {
     "operations": 4000,
     "elapsed_ms": 12,
-    "elapsed_us": 12544,
-    "ops_per_sec": 318855.3094391136
-  },
-  "notes": [
-    "Async commit API wrapped behind sync adapter"
-  ]
+    "elapsed_us": 12515,
+    "ops_per_sec": 319597.3080310755
+  }
 }

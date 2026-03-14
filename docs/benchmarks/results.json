@@ -9,369 +9,319 @@
   "results": [
     {
       "backend": "memory",
-      "kind": "in-memory HashMap",
       "on_disk_bytes": null,
       "memory": {
-        "rss_before_bytes": 14729216,
-        "rss_peak_bytes": 19513344,
-        "rss_after_bytes": 19513344
+        "rss_before_bytes": 14876672,
+        "rss_peak_bytes": 20496384,
+        "rss_after_bytes": 20496384
       },
       "insert": {
         "operations": 4000,
         "elapsed_ms": 0,
-        "elapsed_us": 906,
-        "ops_per_sec": 4413997.66940923
+        "elapsed_us": 444,
+        "ops_per_sec": 9002478.862723026
       },
       "full_read": {
         "operations": 4000,
-        "elapsed_ms": 1,
-        "elapsed_us": 1091,
-        "ops_per_sec": 3664681.6307833255
+        "elapsed_ms": 0,
+        "elapsed_us": 619,
+        "ops_per_sec": 6453180.197939193
       },
       "partial_get_static": {
         "operations": 4000,
         "elapsed_ms": 0,
-        "elapsed_us": 846,
-        "ops_per_sec": 4728132.387706856
+        "elapsed_us": 479,
+        "ops_per_sec": 8343762.880367104
       },
       "full_update_static": {
         "operations": 4000,
-        "elapsed_ms": 2,
-        "elapsed_us": 2723,
-        "ops_per_sec": 1468698.3660730678
+        "elapsed_ms": 1,
+        "elapsed_us": 1831,
+        "ops_per_sec": 2183852.807889304
       },
       "partial_update_static": {
         "operations": 4000,
         "elapsed_ms": 0,
-        "elapsed_us": 657,
-        "ops_per_sec": 6088280.0608828
+        "elapsed_us": 383,
+        "ops_per_sec": 10434366.33074949
       },
       "delete": {
         "operations": 4000,
         "elapsed_ms": 0,
-        "elapsed_us": 539,
-        "ops_per_sec": 7419429.63134709
-      },
-      "notes": [
-        "Baseline only",
-        "No persistence cost"
-      ]
+        "elapsed_us": 338,
+        "ops_per_sec": 11828658.87574454
+      }
     },
     {
       "backend": "rocksdb",
-      "kind": "embedded LSM",
-      "on_disk_bytes": 830154,
+      "on_disk_bytes": 833637,
       "memory": {
-        "rss_before_bytes": 14729216,
+        "rss_before_bytes": 14811136,
         "rss_peak_bytes": 20529152,
-        "rss_after_bytes": 20512768
+        "rss_after_bytes": 20529152
       },
       "insert": {
         "operations": 4000,
         "elapsed_ms": 11,
-        "elapsed_us": 11911,
-        "ops_per_sec": 335812.27153746696
+        "elapsed_us": 11264,
+        "ops_per_sec": 355099.5307497286
       },
       "full_read": {
         "operations": 4000,
         "elapsed_ms": 2,
-        "elapsed_us": 2887,
-        "ops_per_sec": 1385281.3852813854
+        "elapsed_us": 2777,
+        "ops_per_sec": 1440003.99715005
       },
       "partial_get_static": {
         "operations": 4000,
-        "elapsed_ms": 3,
-        "elapsed_us": 3046,
-        "ops_per_sec": 1313179.5293695885
+        "elapsed_ms": 2,
+        "elapsed_us": 2426,
+        "ops_per_sec": 1648245.6197313787
       },
       "full_update_static": {
         "operations": 4000,
-        "elapsed_ms": 17,
-        "elapsed_us": 17384,
-        "ops_per_sec": 230096.0846735184
+        "elapsed_ms": 15,
+        "elapsed_us": 15012,
+        "ops_per_sec": 266435.987942516
       },
       "partial_update_static": {
         "operations": 4000,
-        "elapsed_ms": 16,
-        "elapsed_us": 16411,
-        "ops_per_sec": 243727.8169604095
+        "elapsed_ms": 13,
+        "elapsed_us": 13550,
+        "ops_per_sec": 295181.9391056153
       },
       "delete": {
         "operations": 4000,
-        "elapsed_ms": 10,
-        "elapsed_us": 10039,
-        "ops_per_sec": 398446.06036457815
-      },
-      "notes": [
-        "Widely deployed",
-        "Mature C++ engine"
-      ]
+        "elapsed_ms": 9,
+        "elapsed_us": 9815,
+        "ops_per_sec": 407531.00299491786
+      }
     },
     {
       "backend": "sled",
-      "kind": "embedded B+tree/log",
-      "on_disk_bytes": 3145790,
+      "on_disk_bytes": 3219407,
       "memory": {
-        "rss_before_bytes": 14729216,
-        "rss_peak_bytes": 44138496,
-        "rss_after_bytes": 44122112
+        "rss_before_bytes": 14909440,
+        "rss_peak_bytes": 43581440,
+        "rss_after_bytes": 43565056
       },
       "insert": {
         "operations": 4000,
-        "elapsed_ms": 8,
-        "elapsed_us": 8044,
-        "ops_per_sec": 497208.36150329455
+        "elapsed_ms": 7,
+        "elapsed_us": 7435,
+        "ops_per_sec": 537977.8546844635
       },
       "full_read": {
         "operations": 4000,
-        "elapsed_ms": 2,
-        "elapsed_us": 2870,
-        "ops_per_sec": 1393627.221441791
+        "elapsed_ms": 1,
+        "elapsed_us": 1425,
+        "ops_per_sec": 2806785.289405373
       },
       "partial_get_static": {
         "operations": 4000,
         "elapsed_ms": 1,
-        "elapsed_us": 1760,
-        "ops_per_sec": 2272512.9334392324
+        "elapsed_us": 1230,
+        "ops_per_sec": 3251850.2565179933
       },
       "full_update_static": {
         "operations": 4000,
         "elapsed_ms": 8,
-        "elapsed_us": 8333,
-        "ops_per_sec": 480016.7813866772
+        "elapsed_us": 8156,
+        "ops_per_sec": 490421.1387621141
       },
       "partial_update_static": {
         "operations": 4000,
-        "elapsed_ms": 5,
-        "elapsed_us": 5607,
-        "ops_per_sec": 713356.821795619
+        "elapsed_ms": 6,
+        "elapsed_us": 6369,
+        "ops_per_sec": 627995.0321903483
       },
       "delete": {
         "operations": 4000,
-        "elapsed_ms": 7,
-        "elapsed_us": 7152,
-        "ops_per_sec": 559277.5476350669
-      },
-      "notes": [
-        "Current production candidate in repo"
-      ]
+        "elapsed_ms": 6,
+        "elapsed_us": 6604,
+        "ops_per_sec": 605663.1419179011
+      }
     },
     {
       "backend": "surrealkv",
-      "kind": "embedded transactional LSM",
       "on_disk_bytes": 808101,
       "memory": {
-        "rss_before_bytes": 14761984,
-        "rss_peak_bytes": 226902016,
-        "rss_after_bytes": 226885632
+        "rss_before_bytes": 14925824,
+        "rss_peak_bytes": 227147776,
+        "rss_after_bytes": 227131392
       },
       "insert": {
         "operations": 4000,
-        "elapsed_ms": 14,
-        "elapsed_us": 14147,
-        "ops_per_sec": 282737.9637565273
+        "elapsed_ms": 15,
+        "elapsed_us": 15756,
+        "ops_per_sec": 253856.25795986137
       },
       "full_read": {
         "operations": 4000,
-        "elapsed_ms": 2,
-        "elapsed_us": 2035,
-        "ops_per_sec": 1965481.235796327
+        "elapsed_ms": 1,
+        "elapsed_us": 1911,
+        "ops_per_sec": 2092865.6133741324
       },
       "partial_get_static": {
         "operations": 4000,
         "elapsed_ms": 1,
-        "elapsed_us": 1793,
-        "ops_per_sec": 2229912.9441986587
+        "elapsed_us": 1716,
+        "ops_per_sec": 2330534.96928485
       },
       "full_update_static": {
         "operations": 4000,
         "elapsed_ms": 16,
-        "elapsed_us": 16548,
-        "ops_per_sec": 241710.09895007176
+        "elapsed_us": 16485,
+        "ops_per_sec": 242640.5675193026
       },
       "partial_update_static": {
         "operations": 4000,
-        "elapsed_ms": 14,
-        "elapsed_us": 14684,
-        "ops_per_sec": 272403.7808555168
+        "elapsed_ms": 15,
+        "elapsed_us": 15170,
+        "ops_per_sec": 263663.1948419991
       },
       "delete": {
         "operations": 4000,
         "elapsed_ms": 12,
-        "elapsed_us": 12544,
-        "ops_per_sec": 318855.3094391136
-      },
-      "notes": [
-        "Async commit API wrapped behind sync adapter"
-      ]
+        "elapsed_us": 12515,
+        "ops_per_sec": 319597.3080310755
+      }
     },
     {
       "backend": "fjall",
-      "kind": "embedded Rust LSM",
       "on_disk_bytes": 67112415,
       "memory": {
-        "rss_before_bytes": 14745600,
-        "rss_peak_bytes": 20004864,
-        "rss_after_bytes": 20004864
+        "rss_before_bytes": 14893056,
+        "rss_peak_bytes": 20185088,
+        "rss_after_bytes": 20185088
       },
       "insert": {
         "operations": 4000,
-        "elapsed_ms": 7,
-        "elapsed_us": 7186,
-        "ops_per_sec": 556582.9922987003
+        "elapsed_ms": 11,
+        "elapsed_us": 11842,
+        "ops_per_sec": 337771.27207789675
       },
       "full_read": {
         "operations": 4000,
-        "elapsed_ms": 2,
-        "elapsed_us": 2363,
-        "ops_per_sec": 1692673.8957947632
+        "elapsed_ms": 1,
+        "elapsed_us": 1888,
+        "ops_per_sec": 2118578.2763572936
       },
       "partial_get_static": {
         "operations": 4000,
-        "elapsed_ms": 2,
-        "elapsed_us": 2094,
-        "ops_per_sec": 1909346.1539563085
+        "elapsed_ms": 1,
+        "elapsed_us": 1740,
+        "ops_per_sec": 2298607.213007249
       },
       "full_update_static": {
         "operations": 4000,
-        "elapsed_ms": 12,
-        "elapsed_us": 12931,
-        "ops_per_sec": 309332.1727190213
+        "elapsed_ms": 13,
+        "elapsed_us": 13417,
+        "ops_per_sec": 298124.42508334987
       },
       "partial_update_static": {
         "operations": 4000,
-        "elapsed_ms": 11,
-        "elapsed_us": 11398,
-        "ops_per_sec": 350910.5602673096
+        "elapsed_ms": 12,
+        "elapsed_us": 12045,
+        "ops_per_sec": 332069.79944470123
       },
       "delete": {
         "operations": 4000,
-        "elapsed_ms": 7,
-        "elapsed_us": 7981,
-        "ops_per_sec": 501153.71850421146
-      },
-      "notes": [
-        "Pure Rust",
-        "Single keyspace used for fair comparison"
-      ]
+        "elapsed_ms": 8,
+        "elapsed_us": 8722,
+        "ops_per_sec": 458558.92378421663
+      }
     },
     {
       "backend": "tidehunter",
-      "kind": "embedded WAL/index engine",
       "on_disk_bytes": 6292168,
       "memory": {
-        "rss_before_bytes": 14761984,
-        "rss_peak_bytes": 29933568,
-        "rss_after_bytes": 27721728
+        "rss_before_bytes": 14991360,
+        "rss_peak_bytes": 30113792,
+        "rss_after_bytes": 27918336
       },
       "insert": {
         "operations": 4000,
-        "elapsed_ms": 6,
-        "elapsed_us": 6035,
-        "ops_per_sec": 662791.106138705
+        "elapsed_ms": 5,
+        "elapsed_us": 5653,
+        "ops_per_sec": 707515.8555789297
       },
       "full_read": {
         "operations": 4000,
         "elapsed_ms": 2,
-        "elapsed_us": 2870,
-        "ops_per_sec": 1393606.8286734603
+        "elapsed_us": 2530,
+        "ops_per_sec": 1580409.0154266122
       },
       "partial_get_static": {
         "operations": 4000,
         "elapsed_ms": 2,
-        "elapsed_us": 2600,
-        "ops_per_sec": 1537943.961166915
+        "elapsed_us": 2324,
+        "ops_per_sec": 1720870.2424218825
       },
       "full_update_static": {
         "operations": 4000,
         "elapsed_ms": 9,
-        "elapsed_us": 9967,
-        "ops_per_sec": 401324.3704223939
+        "elapsed_us": 9914,
+        "ops_per_sec": 403431.3103756073
       },
       "partial_update_static": {
         "operations": 4000,
         "elapsed_ms": 7,
-        "elapsed_us": 7334,
-        "ops_per_sec": 545355.3651447298
+        "elapsed_us": 7482,
+        "ops_per_sec": 534606.4109895747
       },
       "delete": {
         "operations": 4000,
         "elapsed_ms": 3,
-        "elapsed_us": 3234,
-        "ops_per_sec": 1236794.513084822
-      },
-      "notes": [
-        "Git dependency pinned to upstream commit",
-        "Single key space with hashed indexing"
-      ]
+        "elapsed_us": 3461,
+        "ops_per_sec": 1155573.3971614314
+      }
     },
     {
       "backend": "turso",
-      "kind": "embedded SQLite-compatible SQL engine",
       "on_disk_bytes": 5099096,
       "memory": {
-        "rss_before_bytes": 14745600,
-        "rss_peak_bytes": 22757376,
-        "rss_after_bytes": 21741568
+        "rss_before_bytes": 14794752,
+        "rss_peak_bytes": 22593536,
+        "rss_after_bytes": 21577728
       },
       "insert": {
         "operations": 4000,
-        "elapsed_ms": 167,
-        "elapsed_us": 167599,
-        "ops_per_sec": 23866.354429516028
+        "elapsed_ms": 225,
+        "elapsed_us": 225567,
+        "ops_per_sec": 17733.08416363978
       },
       "full_read": {
         "operations": 4000,
-        "elapsed_ms": 33,
-        "elapsed_us": 33146,
-        "ops_per_sec": 120676.99917212562
+        "elapsed_ms": 30,
+        "elapsed_us": 30914,
+        "ops_per_sec": 129389.59461228747
       },
       "partial_get_static": {
         "operations": 4000,
         "elapsed_ms": 31,
-        "elapsed_us": 31755,
-        "ops_per_sec": 125964.4150527476
+        "elapsed_us": 31334,
+        "ops_per_sec": 127652.9988108844
       },
       "full_update_static": {
         "operations": 4000,
-        "elapsed_ms": 181,
-        "elapsed_us": 181540,
-        "ops_per_sec": 22033.63572203191
+        "elapsed_ms": 221,
+        "elapsed_us": 221866,
+        "ops_per_sec": 18028.855288809264
       },
       "partial_update_static": {
         "operations": 4000,
-        "elapsed_ms": 229,
-        "elapsed_us": 229752,
-        "ops_per_sec": 17410.007464671275
+        "elapsed_ms": 292,
+        "elapsed_us": 292649,
+        "ops_per_sec": 13668.231881620844
       },
       "delete": {
         "operations": 4000,
-        "elapsed_ms": 154,
-        "elapsed_us": 154423,
-        "ops_per_sec": 25902.758235136032
-      },
-      "notes": [
-        "Rust SQLite-compatible engine",
-        "Adapter stores data in a kv table"
-      ]
+        "elapsed_ms": 142,
+        "elapsed_us": 142542,
+        "ops_per_sec": 28061.86027616093
+      }
     }
   ],
-  "exclusions": [
-    {
-      "backend": "guardian-db",
-      "status": "not integrated",
-      "reason": "Distributed Iroh-backed database rather than a comparable local embedded key-value engine."
-    },
-    {
-      "backend": "nomt",
-      "status": "not integrated",
-      "reason": "Specialized merklized store with session semantics that do not match the current synchronous point-read/update backend contract."
-    },
-    {
-      "backend": "qmdb",
-      "status": "not integrated",
-      "reason": "Research-oriented verifiable database with extra build requirements and no straightforward crates.io package for direct embedding here."
-    }
-  ],
-  "generated_at_unix_ms": 1773391003322
+  "generated_at_unix_ms": 1773480507188
 }

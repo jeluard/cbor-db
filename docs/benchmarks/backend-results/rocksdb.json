@@ -1,50 +1,45 @@
 {
   "backend": "rocksdb",
-  "kind": "embedded LSM",
-  "on_disk_bytes": 830154,
+  "on_disk_bytes": 833637,
   "memory": {
-    "rss_before_bytes": 14729216,
+    "rss_before_bytes": 14811136,
     "rss_peak_bytes": 20529152,
-    "rss_after_bytes": 20512768
+    "rss_after_bytes": 20529152
   },
   "insert": {
     "operations": 4000,
     "elapsed_ms": 11,
-    "elapsed_us": 11911,
-    "ops_per_sec": 335812.27153746696
+    "elapsed_us": 11264,
+    "ops_per_sec": 355099.5307497286
   },
   "full_read": {
     "operations": 4000,
     "elapsed_ms": 2,
-    "elapsed_us": 2887,
-    "ops_per_sec": 1385281.3852813854
+    "elapsed_us": 2777,
+    "ops_per_sec": 1440003.99715005
   },
   "partial_get_static": {
     "operations": 4000,
-    "elapsed_ms": 3,
-    "elapsed_us": 3046,
-    "ops_per_sec": 1313179.5293695885
+    "elapsed_ms": 2,
+    "elapsed_us": 2426,
+    "ops_per_sec": 1648245.6197313787
   },
   "full_update_static": {
     "operations": 4000,
-    "elapsed_ms": 17,
-    "elapsed_us": 17384,
-    "ops_per_sec": 230096.0846735184
+    "elapsed_ms": 15,
+    "elapsed_us": 15012,
+    "ops_per_sec": 266435.987942516
   },
   "partial_update_static": {
     "operations": 4000,
-    "elapsed_ms": 16,
-    "elapsed_us": 16411,
-    "ops_per_sec": 243727.8169604095
+    "elapsed_ms": 13,
+    "elapsed_us": 13550,
+    "ops_per_sec": 295181.9391056153
   },
   "delete": {
     "operations": 4000,
-    "elapsed_ms": 10,
-    "elapsed_us": 10039,
-    "ops_per_sec": 398446.06036457815
-  },
-  "notes": [
-    "Widely deployed",
-    "Mature C++ engine"
-  ]
+    "elapsed_ms": 9,
+    "elapsed_us": 9815,
+    "ops_per_sec": 407531.00299491786
+  }
 }

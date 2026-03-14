@@ -1,50 +1,45 @@
 {
   "backend": "turso",
-  "kind": "embedded SQLite-compatible SQL engine",
   "on_disk_bytes": 5099096,
   "memory": {
-    "rss_before_bytes": 14745600,
-    "rss_peak_bytes": 22757376,
-    "rss_after_bytes": 21741568
+    "rss_before_bytes": 14794752,
+    "rss_peak_bytes": 22593536,
+    "rss_after_bytes": 21577728
   },
   "insert": {
     "operations": 4000,
-    "elapsed_ms": 167,
-    "elapsed_us": 167599,
-    "ops_per_sec": 23866.354429516028
+    "elapsed_ms": 225,
+    "elapsed_us": 225567,
+    "ops_per_sec": 17733.08416363978
   },
   "full_read": {
     "operations": 4000,
-    "elapsed_ms": 33,
-    "elapsed_us": 33146,
-    "ops_per_sec": 120676.99917212562
+    "elapsed_ms": 30,
+    "elapsed_us": 30914,
+    "ops_per_sec": 129389.59461228747
   },
   "partial_get_static": {
     "operations": 4000,
     "elapsed_ms": 31,
-    "elapsed_us": 31755,
-    "ops_per_sec": 125964.4150527476
+    "elapsed_us": 31334,
+    "ops_per_sec": 127652.9988108844
   },
   "full_update_static": {
     "operations": 4000,
-    "elapsed_ms": 181,
-    "elapsed_us": 181540,
-    "ops_per_sec": 22033.63572203191
+    "elapsed_ms": 221,
+    "elapsed_us": 221866,
+    "ops_per_sec": 18028.855288809264
   },
   "partial_update_static": {
     "operations": 4000,
-    "elapsed_ms": 229,
-    "elapsed_us": 229752,
-    "ops_per_sec": 17410.007464671275
+    "elapsed_ms": 292,
+    "elapsed_us": 292649,
+    "ops_per_sec": 13668.231881620844
   },
   "delete": {
     "operations": 4000,
-    "elapsed_ms": 154,
-    "elapsed_us": 154423,
-    "ops_per_sec": 25902.758235136032
-  },
-  "notes": [
-    "Rust SQLite-compatible engine",
-    "Adapter stores data in a kv table"
-  ]
+    "elapsed_ms": 142,
+    "elapsed_us": 142542,
+    "ops_per_sec": 28061.86027616093
+  }
 }

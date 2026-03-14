@@ -83,83 +83,83 @@ make bench
 The README benchmark snapshot is rendered by `scripts/render-benchmark-readme.js` from `docs/benchmarks/results.json`.
 
 <!-- BENCHMARK-SNAPSHOT:START -->
-Current benchmark snapshot (`make bench`, 4000 `Row` values, 24-byte keys). Each backend is benchmarked in its own child process. The workload writes the full row, reads it back with full `get!`-equivalent retrieval into a Rust struct, reads only `rewards` through `get!`, updates `rewards` to 0 through either full deserialize/mutate/re-encode or direct CBOR rewrite, then deletes the entry. The table below shows the fixed-width `row_static` path-targeted variants and also tracks resident memory before the backend run, peak observed resident memory during the run, and resident memory after the backend run.
+Current benchmark snapshot (`make bench`, 4000 `Row` values, 24-byte keys). Each backend is benchmarked in its own child process. The workload writes the full row, reads it back with full `get!`-equivalent retrieval into a Rust struct, reads only `rewards` through `get!`, updates `rewards` to 0 through either full deserialize/mutate/re-encode or direct CBOR rewrite, then deletes the entry. The table below shows the fixed-width `row_static` path-targeted variants, resident memory before the backend run, peak observed resident memory during the run, resident memory after the backend run, and the persisted raw store size after the baseline seeded workload.
 
 | Backend | Insert | Full get! | Partial get! | Full update! | Partial update! | Delete | RSS before / peak / after | Disk |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: |
-| memory | 4.4M ops/s | 3.7M ops/s | 4.7M ops/s | 1.5M ops/s | 6.1M ops/s | 7.4M ops/s | 14.0 MiB / 18.6 MiB / 18.6 MiB | n/a |
-| rocksdb | 336k ops/s | 1.4M ops/s | 1.3M ops/s | 230k ops/s | 244k ops/s | 398k ops/s | 14.0 MiB / 19.6 MiB / 19.6 MiB | 811 KiB |
-| sled | 497k ops/s | 1.4M ops/s | **2.3M ops/s** | **480k ops/s** | **713k ops/s** | 559k ops/s | 14.0 MiB / 42.1 MiB / 42.1 MiB | 3.0 MiB |
-| surrealkv | 283k ops/s | **2.0M ops/s** | 2.2M ops/s | 242k ops/s | 272k ops/s | 319k ops/s | 14.1 MiB / 216.4 MiB / 216.4 MiB | **789 KiB** |
-| fjall | 557k ops/s | 1.7M ops/s | 1.9M ops/s | 309k ops/s | 351k ops/s | 501k ops/s | 14.1 MiB / 19.1 MiB / 19.1 MiB | 64.0 MiB |
-| tidehunter | **663k ops/s** | 1.4M ops/s | 1.5M ops/s | 401k ops/s | 545k ops/s | **1.2M ops/s** | 14.1 MiB / 28.5 MiB / 26.4 MiB | 6.0 MiB |
-| turso | 24k ops/s | 121k ops/s | 126k ops/s | 22k ops/s | 17k ops/s | 26k ops/s | 14.1 MiB / 21.7 MiB / 20.7 MiB | 4.9 MiB |
+| memory | 9.0M ops/s | 6.5M ops/s | 8.3M ops/s | 2.2M ops/s | 10.4M ops/s | 11.8M ops/s | 14.2 MiB / 19.5 MiB / 19.5 MiB | n/a |
+| rocksdb | 355k ops/s | 1.4M ops/s | 1.6M ops/s | 266k ops/s | 295k ops/s | 408k ops/s | 14.1 MiB / 19.6 MiB / 19.6 MiB | 814 KiB |
+| sled | 538k ops/s | 2.8M ops/s | 3.3M ops/s | 490k ops/s | 628k ops/s | 606k ops/s | 14.2 MiB / 41.6 MiB / 41.5 MiB | 3.1 MiB |
+| surrealkv | 254k ops/s | 2.1M ops/s | 2.3M ops/s | 243k ops/s | 264k ops/s | 320k ops/s | 14.2 MiB / 216.6 MiB / 216.6 MiB | 789 KiB |
+| fjall | 338k ops/s | 2.1M ops/s | 2.3M ops/s | 298k ops/s | 332k ops/s | 459k ops/s | 14.2 MiB / 19.3 MiB / 19.3 MiB | 64.0 MiB |
+| tidehunter | 708k ops/s | 1.6M ops/s | 1.7M ops/s | 403k ops/s | 535k ops/s | 1.2M ops/s | 14.3 MiB / 28.7 MiB / 26.6 MiB | 6.0 MiB |
+| turso | 18k ops/s | 129k ops/s | 128k ops/s | 18k ops/s | 14k ops/s | 28k ops/s | 14.1 MiB / 21.5 MiB / 20.6 MiB | 4.9 MiB |
 
 ### Backend Comparison Charts
 
 #### Insert
 
 ```text
-rocksdb    | ##############               336k ops/s
-sled       | #####################        497k ops/s
-surrealkv  | ############                 283k ops/s
-fjall      | ########################     557k ops/s
-tidehunter | ############################ 663k ops/s
-turso      | #                            24k ops/s
+rocksdb    | ##############               355k ops/s
+sled       | #####################        538k ops/s
+surrealkv  | ##########                   254k ops/s
+fjall      | #############                338k ops/s
+tidehunter | ############################ 708k ops/s
+turso      | #                            18k ops/s
 ```
 
 #### Full get!
 
 ```text
-rocksdb    | ####################         1.4M ops/s
-sled       | ####################         1.4M ops/s
-surrealkv  | ############################ 2.0M ops/s
-fjall      | ########################     1.7M ops/s
-tidehunter | ####################         1.4M ops/s
-turso      | ##                           121k ops/s
+rocksdb    | ##############               1.4M ops/s
+sled       | ############################ 2.8M ops/s
+surrealkv  | #####################        2.1M ops/s
+fjall      | #####################        2.1M ops/s
+tidehunter | ################             1.6M ops/s
+turso      | #                            129k ops/s
 ```
 
 #### Partial get!
 
 ```text
-rocksdb    | ################             1.3M ops/s
-sled       | ############################ 2.3M ops/s
-surrealkv  | ###########################  2.2M ops/s
-fjall      | ########################     1.9M ops/s
-tidehunter | ###################          1.5M ops/s
-turso      | ##                           126k ops/s
+rocksdb    | ##############               1.6M ops/s
+sled       | ############################ 3.3M ops/s
+surrealkv  | ####################         2.3M ops/s
+fjall      | ####################         2.3M ops/s
+tidehunter | ###############              1.7M ops/s
+turso      | #                            128k ops/s
 ```
 
 #### Full update!
 
 ```text
-rocksdb    | #############                230k ops/s
-sled       | ############################ 480k ops/s
-surrealkv  | ##############               242k ops/s
-fjall      | ##################           309k ops/s
-tidehunter | #######################      401k ops/s
-turso      | #                            22k ops/s
+rocksdb    | ###############              266k ops/s
+sled       | ############################ 490k ops/s
+surrealkv  | ##############               243k ops/s
+fjall      | #################            298k ops/s
+tidehunter | #######################      403k ops/s
+turso      | #                            18k ops/s
 ```
 
 #### Partial update!
 
 ```text
-rocksdb    | ##########                   244k ops/s
-sled       | ############################ 713k ops/s
-surrealkv  | ###########                  272k ops/s
-fjall      | ##############               351k ops/s
-tidehunter | #####################        545k ops/s
-turso      | #                            17k ops/s
+rocksdb    | #############                295k ops/s
+sled       | ############################ 628k ops/s
+surrealkv  | ############                 264k ops/s
+fjall      | ###############              332k ops/s
+tidehunter | ########################     535k ops/s
+turso      | #                            14k ops/s
 ```
 
 #### Delete
 
 ```text
-rocksdb    | #########                    398k ops/s
-sled       | #############                559k ops/s
-surrealkv  | #######                      319k ops/s
-fjall      | ###########                  501k ops/s
+rocksdb    | ##########                   408k ops/s
+sled       | ###############              606k ops/s
+surrealkv  | ########                     320k ops/s
+fjall      | ###########                  459k ops/s
 tidehunter | ############################ 1.2M ops/s
-turso      | #                            26k ops/s
+turso      | #                            28k ops/s
 ```
 <!-- BENCHMARK-SNAPSHOT:END -->

@@ -1,3 +1,4 @@
+use criterion::{Criterion, Throughput};
 use dsl::{get, update};
 use minicbor as cbor;
 use minicbor::data::Type;
@@ -42,6 +43,7 @@ struct ReportConfig {
 #[derive(Serialize, Deserialize)]
 struct BackendReport {
     backend: String,
+    on_disk_bytes: Option<u64>,
     memory: MemoryProfile,
     insert: Metric,
     full_read: Metric,
@@ -109,6 +111,11 @@ struct BenchmarkConfig {
     namespaces: usize,
     subset_size: usize,
     out_dir: PathBuf,
+    criterion_dir: PathBuf,
+    criterion_sample_size: usize,
+    criterion_warm_up: Duration,
+    criterion_measurement: Duration,
+    criterion_resamples: usize,
     backends: Vec<String>,
 }
 
@@ -126,11 +133,28 @@ impl BenchmarkConfig {
     fn apply_child_env(&self, command: &mut Command) {
         command
             .env("CBOR_DB_BENCH_OUT_DIR", &self.out_dir)
+            .env("CBOR_DB_BENCH_CRITERION_DIR", &self.criterion_dir)
             .env("CBOR_DB_BENCH_ENTRIES", self.entries.to_string())
             .env("CBOR_DB_BENCH_KEY_SIZE", self.key_size.to_string())
             .env("CBOR_DB_BENCH_VALUE_SIZE", self.value_size.to_string())
             .env("CBOR_DB_BENCH_SUBSET_SIZE", self.subset_size.to_string())
-            .env("CBOR_DB_BENCH_NAMESPACES", self.namespaces.to_string());
+            .env("CBOR_DB_BENCH_NAMESPACES", self.namespaces.to_string())
+            .env(
+                "CBOR_DB_BENCH_SAMPLE_SIZE",
+                self.criterion_sample_size.to_string(),
+            )
+            .env(
+                "CBOR_DB_BENCH_WARM_UP_MS",
+                self.criterion_warm_up.as_millis().to_string(),
+            )
+            .env(
+                "CBOR_DB_BENCH_MEASUREMENT_MS",
+                self.criterion_measurement.as_millis().to_string(),
+            )
+            .env(
+                "CBOR_DB_BENCH_RESAMPLES",
+                self.criterion_resamples.to_string(),
+            );
     }
 }
 
@@ -149,6 +173,17 @@ struct BackendFactory {
     create: fn(&Path) -> Result<Box<dyn StorageBackend>, String>,
 }
 
+#[derive(Deserialize)]
+struct CriterionEstimates {
+    mean: CriterionStatistic,
+    slope: Option<CriterionStatistic>,
+}
+
+#[derive(Deserialize)]
+struct CriterionStatistic {
+    point_estimate: f64,
+}
+
 type DynStore = Store<Box<dyn StorageBackend>>;
 
 const STATIC_NAMESPACE: &[u8] = b"row_static";
@@ -160,6 +195,7 @@ const CHILD_RESULT_PATH_ENV: &str = "CBOR_DB_BENCH_CHILD_RESULT";
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = load_config()?;
     fs::create_dir_all(&config.out_dir)?;
+    fs::create_dir_all(&config.criterion_dir)?;
 
     if let Ok(backend_name) = env::var(CHILD_BACKEND_ENV) {
         let result_path = PathBuf::from(env::var(CHILD_RESULT_PATH_ENV)?);
@@ -257,11 +293,48 @@ fn benchmark_backend(
     dataset: &[Operation],
 ) -> Result<BackendReport, Box<dyn std::error::Error>> {
     let backend_root = config.out_dir.join("data").join(factory.name);
-    if backend_root.exists() {
-        fs::remove_dir_all(&backend_root)?;
-    }
-    fs::create_dir_all(&backend_root)?;
+    reset_directory(&backend_root)?;
 
+    let memory = run_validation_profile(factory, &backend_root, dataset)?;
+    let on_disk_bytes = measure_backend_disk_usage(factory.name, &backend_root.join("raw"))?;
+
+    let mut criterion = build_criterion(config);
+    run_criterion_benchmarks(&mut criterion, factory, &backend_root, dataset)?;
+    criterion.final_summary();
+
+    Ok(BackendReport {
+        backend: factory.name.to_string(),
+        on_disk_bytes,
+        memory,
+        insert: load_criterion_metric(config, factory.name, "insert", dataset.len())?,
+        full_read: load_criterion_metric(config, factory.name, "full_read", dataset.len())?,
+        partial_get_static: load_criterion_metric(
+            config,
+            factory.name,
+            "partial_get_static",
+            dataset.len(),
+        )?,
+        full_update_static: load_criterion_metric(
+            config,
+            factory.name,
+            "full_update_static",
+            dataset.len(),
+        )?,
+        partial_update_static: load_criterion_metric(
+            config,
+            factory.name,
+            "partial_update_static",
+            dataset.len(),
+        )?,
+        delete: load_criterion_metric(config, factory.name, "delete", dataset.len())?,
+    })
+}
+
+fn run_validation_profile(
+    factory: &BackendFactory,
+    backend_root: &Path,
+    dataset: &[Operation],
+) -> Result<MemoryProfile, Box<dyn std::error::Error>> {
     let raw_backend_dir = backend_root.join("raw");
     fs::create_dir_all(&raw_backend_dir)?;
 
@@ -272,44 +345,262 @@ fn benchmark_backend(
     let store = Store::open(backend)?;
     memory.observe()?;
 
-    let insert = bench_insert(&store, dataset)?;
+    let _ = bench_insert(&store, dataset)?;
     memory.observe()?;
-    let full_read = bench_full_read(&store, dataset)?;
+    let _ = bench_full_read(&store, dataset)?;
     memory.observe()?;
-    let partial_get_static = bench_partial_get_static(&store, dataset)?;
+    let _ = bench_partial_get_static(&store, dataset)?;
     memory.observe()?;
-    let full_update_static =
-        bench_full_update_static(factory, &backend_root.join("full-update-static"), dataset)?;
+    let _ = bench_full_update_static(factory, &backend_root.join("full-update-static"), dataset)?;
     memory.observe()?;
-    let partial_update_static = bench_partial_update_static(
+    let _ = bench_partial_update_static(
         factory,
         &backend_root.join("partial-update-static"),
         dataset,
     )?;
     memory.observe()?;
-    let delete = bench_delete(factory, &backend_root.join("delete"), dataset)?;
+    let _ = bench_delete(factory, &backend_root.join("delete"), dataset)?;
     memory.observe()?;
 
     drop(store);
     let rss_after_bytes = memory.observe()?;
 
-    Ok(BackendReport {
-        backend: factory.name.to_string(),
-        memory: MemoryProfile {
-            rss_before_bytes,
-            rss_peak_bytes: memory.peak_bytes(),
-            rss_after_bytes,
-        },
-        insert,
-        full_read,
-        partial_get_static,
-        full_update_static,
-        partial_update_static,
-        delete,
+    Ok(MemoryProfile {
+        rss_before_bytes,
+        rss_peak_bytes: memory.peak_bytes(),
+        rss_after_bytes,
     })
 }
 
+fn run_criterion_benchmarks(
+    criterion: &mut Criterion,
+    factory: &BackendFactory,
+    backend_root: &Path,
+    dataset: &[Operation],
+) -> Result<(), String> {
+    let group_name = format!("backend_{}", factory.name);
+    let mut group = criterion.benchmark_group(group_name);
+    group.throughput(Throughput::Elements(dataset.len() as u64));
+
+    let insert_root = backend_root.join("criterion").join("insert");
+    let mut insert_iteration = 0_u64;
+    group.bench_function("insert", |b| {
+        b.iter_custom(|iters| {
+            let mut elapsed = Duration::ZERO;
+            for _ in 0..iters {
+                let store =
+                    prepare_empty_store(factory, &iteration_dir(&insert_root, insert_iteration))
+                        .expect("insert setup must succeed");
+                insert_iteration += 1;
+
+                let started = Instant::now();
+                seed_namespace(&store, STATIC_NAMESPACE, dataset)
+                    .expect("insert benchmark must succeed");
+                elapsed += started.elapsed();
+            }
+            elapsed
+        });
+    });
+
+    let full_read_store = prepare_seeded_store(
+        factory,
+        &backend_root.join("criterion").join("full-read"),
+        STATIC_NAMESPACE,
+        dataset,
+    )?;
+    group.bench_function("full_read", |b| {
+        b.iter(|| run_full_read_pass(&full_read_store, dataset).expect("full read must succeed"));
+    });
+
+    let partial_get_store = prepare_seeded_store(
+        factory,
+        &backend_root.join("criterion").join("partial-get-static"),
+        STATIC_NAMESPACE,
+        dataset,
+    )?;
+    group.bench_function("partial_get_static", |b| {
+        b.iter(|| {
+            run_partial_get_static_pass(&partial_get_store, dataset)
+                .expect("partial get benchmark must succeed")
+        });
+    });
+
+    let full_update_root = backend_root.join("criterion").join("full-update-static");
+    let mut full_update_iteration = 0_u64;
+    group.bench_function("full_update_static", |b| {
+        b.iter_custom(|iters| {
+            let mut elapsed = Duration::ZERO;
+            for _ in 0..iters {
+                let store = prepare_seeded_store(
+                    factory,
+                    &iteration_dir(&full_update_root, full_update_iteration),
+                    STATIC_NAMESPACE,
+                    dataset,
+                )
+                .expect("full update setup must succeed");
+                full_update_iteration += 1;
+
+                let started = Instant::now();
+                run_full_update_static_pass(&store, dataset)
+                    .expect("full update benchmark must succeed");
+                elapsed += started.elapsed();
+            }
+            elapsed
+        });
+    });
+
+    let partial_update_root = backend_root.join("criterion").join("partial-update-static");
+    let mut partial_update_iteration = 0_u64;
+    group.bench_function("partial_update_static", |b| {
+        b.iter_custom(|iters| {
+            let mut elapsed = Duration::ZERO;
+            for _ in 0..iters {
+                let store = prepare_seeded_store(
+                    factory,
+                    &iteration_dir(&partial_update_root, partial_update_iteration),
+                    STATIC_NAMESPACE,
+                    dataset,
+                )
+                .expect("partial update setup must succeed");
+                partial_update_iteration += 1;
+
+                let started = Instant::now();
+                run_partial_update_static_pass(&store, dataset)
+                    .expect("partial update benchmark must succeed");
+                elapsed += started.elapsed();
+            }
+            elapsed
+        });
+    });
+
+    let delete_root = backend_root.join("criterion").join("delete");
+    let mut delete_iteration = 0_u64;
+    group.bench_function("delete", |b| {
+        b.iter_custom(|iters| {
+            let mut elapsed = Duration::ZERO;
+            for _ in 0..iters {
+                let store = prepare_seeded_store(
+                    factory,
+                    &iteration_dir(&delete_root, delete_iteration),
+                    STATIC_NAMESPACE,
+                    dataset,
+                )
+                .expect("delete setup must succeed");
+                delete_iteration += 1;
+
+                let started = Instant::now();
+                run_delete_pass(&store, dataset).expect("delete benchmark must succeed");
+                elapsed += started.elapsed();
+            }
+            elapsed
+        });
+    });
+
+    group.finish();
+    Ok(())
+}
+
+fn build_criterion(config: &BenchmarkConfig) -> Criterion {
+    Criterion::default()
+        .sample_size(config.criterion_sample_size)
+        .warm_up_time(config.criterion_warm_up)
+        .measurement_time(config.criterion_measurement)
+        .nresamples(config.criterion_resamples)
+        .output_directory(config.criterion_dir.as_path())
+        .without_plots()
+}
+
+fn load_criterion_metric(
+    config: &BenchmarkConfig,
+    backend_name: &str,
+    benchmark_name: &str,
+    operations: usize,
+) -> Result<Metric, Box<dyn std::error::Error>> {
+    let estimate_path = config
+        .criterion_dir
+        .join(format!("backend_{backend_name}"))
+        .join(benchmark_name)
+        .join("new")
+        .join("estimates.json");
+
+    let estimates = serde_json::from_slice::<CriterionEstimates>(&fs::read(&estimate_path)?)?;
+    let point_estimate_ns = estimates
+        .slope
+        .as_ref()
+        .unwrap_or(&estimates.mean)
+        .point_estimate;
+    Ok(metric_from_estimate(operations, point_estimate_ns))
+}
+
+fn metric_from_estimate(operations: usize, point_estimate_ns: f64) -> Metric {
+    let seconds = point_estimate_ns.max(0.0) / 1_000_000_000.0;
+    let elapsed = Duration::from_secs_f64(seconds);
+    Metric {
+        operations,
+        elapsed_ms: elapsed.as_millis(),
+        elapsed_us: elapsed.as_micros(),
+        ops_per_sec: if seconds == 0.0 {
+            operations as f64
+        } else {
+            operations as f64 / seconds
+        },
+    }
+}
+
+fn measure_backend_disk_usage(
+    backend_name: &str,
+    backend_dir: &Path,
+) -> Result<Option<u64>, Box<dyn std::error::Error>> {
+    if backend_name == "memory" {
+        return Ok(None);
+    }
+
+    Ok(Some(directory_size_bytes(backend_dir)?))
+}
+
+fn directory_size_bytes(path: &Path) -> Result<u64, Box<dyn std::error::Error>> {
+    let mut total_bytes = 0_u64;
+
+    for entry in fs::read_dir(path)? {
+        let entry = entry?;
+        let entry_path = entry.path();
+        let metadata = entry.metadata()?;
+
+        if metadata.is_dir() {
+            total_bytes = total_bytes.saturating_add(directory_size_bytes(&entry_path)?);
+        } else if metadata.is_file() {
+            total_bytes = total_bytes.saturating_add(metadata.len());
+        }
+    }
+
+    Ok(total_bytes)
+}
+
+fn iteration_dir(root: &Path, iteration: u64) -> PathBuf {
+    root.join(format!("run-{iteration}"))
+}
+
 fn load_config() -> Result<BenchmarkConfig, Box<dyn std::error::Error>> {
+    let criterion_sample_size = read_env_usize("CBOR_DB_BENCH_SAMPLE_SIZE", 20)?;
+    if criterion_sample_size < 10 {
+        return Err("CBOR_DB_BENCH_SAMPLE_SIZE must be at least 10".into());
+    }
+
+    let criterion_resamples = read_env_usize("CBOR_DB_BENCH_RESAMPLES", 20_000)?;
+    if criterion_resamples == 0 {
+        return Err("CBOR_DB_BENCH_RESAMPLES must be greater than 0".into());
+    }
+
+    let criterion_warm_up_ms = read_env_u64("CBOR_DB_BENCH_WARM_UP_MS", 500)?;
+    if criterion_warm_up_ms == 0 {
+        return Err("CBOR_DB_BENCH_WARM_UP_MS must be greater than 0".into());
+    }
+
+    let criterion_measurement_ms = read_env_u64("CBOR_DB_BENCH_MEASUREMENT_MS", 2_000)?;
+    if criterion_measurement_ms == 0 {
+        return Err("CBOR_DB_BENCH_MEASUREMENT_MS must be greater than 0".into());
+    }
+
     Ok(BenchmarkConfig {
         entries: read_env_usize("CBOR_DB_BENCH_ENTRIES", 4_000)?,
         key_size: read_env_usize("CBOR_DB_BENCH_KEY_SIZE", 24)?,
@@ -319,6 +610,14 @@ fn load_config() -> Result<BenchmarkConfig, Box<dyn std::error::Error>> {
         out_dir: PathBuf::from(
             env::var("CBOR_DB_BENCH_OUT_DIR").unwrap_or_else(|_| "docs/benchmarks".to_string()),
         ),
+        criterion_dir: PathBuf::from(
+            env::var("CBOR_DB_BENCH_CRITERION_DIR")
+                .unwrap_or_else(|_| "target/criterion".to_string()),
+        ),
+        criterion_sample_size,
+        criterion_warm_up: Duration::from_millis(criterion_warm_up_ms),
+        criterion_measurement: Duration::from_millis(criterion_measurement_ms),
+        criterion_resamples,
         backends: env::var("CBOR_DB_BENCH_BACKENDS")
             .unwrap_or_else(|_| "memory,sled,rocksdb,fjall,surrealkv,tidehunter,turso".to_string())
             .split(',')
@@ -330,6 +629,13 @@ fn load_config() -> Result<BenchmarkConfig, Box<dyn std::error::Error>> {
 }
 
 fn read_env_usize(key: &str, default: usize) -> Result<usize, Box<dyn std::error::Error>> {
+    match env::var(key) {
+        Ok(value) => Ok(value.parse()?),
+        Err(_) => Ok(default),
+    }
+}
+
+fn read_env_u64(key: &str, default: u64) -> Result<u64, Box<dyn std::error::Error>> {
     match env::var(key) {
         Ok(value) => Ok(value.parse()?),
         Err(_) => Ok(default),
@@ -419,6 +725,11 @@ fn bench_insert(store: &DynStore, dataset: &[Operation]) -> Result<Metric, Strin
 
 fn bench_full_read(store: &DynStore, dataset: &[Operation]) -> Result<Metric, String> {
     let started = Instant::now();
+    run_full_read_pass(store, dataset)?;
+    Ok(metric(dataset.len(), started.elapsed()))
+}
+
+fn run_full_read_pass(store: &DynStore, dataset: &[Operation]) -> Result<(), String> {
     for operation in dataset {
         let value =
             get!(store, b"row_static", operation.key.as_slice()).map_err(|err| err.to_string())?;
@@ -427,11 +738,16 @@ fn bench_full_read(store: &DynStore, dataset: &[Operation]) -> Result<Metric, St
             return Err("full read returned unexpected row".to_string());
         }
     }
-    Ok(metric(dataset.len(), started.elapsed()))
+    Ok(())
 }
 
 fn bench_partial_get_static(store: &DynStore, dataset: &[Operation]) -> Result<Metric, String> {
     let started = Instant::now();
+    run_partial_get_static_pass(store, dataset)?;
+    Ok(metric(dataset.len(), started.elapsed()))
+}
+
+fn run_partial_get_static_pass(store: &DynStore, dataset: &[Operation]) -> Result<(), String> {
     for operation in dataset {
         let value = get!(store, b"row_static", operation.key.as_slice(), rewards)
             .map_err(|err| err.to_string())?;
@@ -439,7 +755,7 @@ fn bench_partial_get_static(store: &DynStore, dataset: &[Operation]) -> Result<M
             return Err("static partial get returned unexpected rewards bytes".to_string());
         }
     }
-    Ok(metric(dataset.len(), started.elapsed()))
+    Ok(())
 }
 
 fn bench_full_update_static(
@@ -466,9 +782,7 @@ fn bench_delete(
     let store = prepare_seeded_store(factory, backend_dir, STATIC_NAMESPACE, dataset)?;
 
     let started = Instant::now();
-    for operation in dataset {
-        store.delete(STATIC_NAMESPACE, &operation.key)?;
-    }
+    run_delete_pass(&store, dataset)?;
     let result = metric(dataset.len(), started.elapsed());
 
     for operation in dataset {
@@ -482,15 +796,26 @@ fn bench_delete(
     Ok(result)
 }
 
+fn run_delete_pass(store: &DynStore, dataset: &[Operation]) -> Result<(), String> {
+    for operation in dataset {
+        store.delete(STATIC_NAMESPACE, &operation.key)?;
+    }
+    Ok(())
+}
+
+fn prepare_empty_store(factory: &BackendFactory, backend_dir: &Path) -> Result<DynStore, String> {
+    reset_directory(backend_dir)?;
+    let backend = (factory.create)(backend_dir)?;
+    Store::open(backend)
+}
+
 fn prepare_seeded_store(
     factory: &BackendFactory,
     backend_dir: &Path,
     namespace: &[u8],
     dataset: &[Operation],
 ) -> Result<DynStore, String> {
-    reset_directory(backend_dir)?;
-    let backend = (factory.create)(backend_dir)?;
-    let store = Store::open(backend)?;
+    let store = prepare_empty_store(factory, backend_dir)?;
     seed_namespace(&store, namespace, dataset)?;
     Ok(store)
 }
@@ -504,28 +829,40 @@ fn bench_update_static(
     let store = prepare_seeded_store(factory, backend_dir, STATIC_NAMESPACE, dataset)?;
 
     let started = Instant::now();
-    for operation in dataset {
-        if partial {
-            update!(
-                store,
-                b"row_static",
-                operation.key.as_slice(),
-                rewards,
-                |value: &mut [u8]| overwrite_reward_with_fixed_width_zero(value)
-            )?;
-        } else {
-            update!(
-                store,
-                b"row_static",
-                operation.key.as_slice(),
-                |value: &mut Vec<u8>| rewrite_row_rewards_to_zero(value)
-            )?;
-        }
+    if partial {
+        run_partial_update_static_pass(&store, dataset)?;
+    } else {
+        run_full_update_static_pass(&store, dataset)?;
     }
     let result = metric(dataset.len(), started.elapsed());
 
     verify_full_values(&store, STATIC_NAMESPACE, dataset, partial)?;
     Ok(result)
+}
+
+fn run_full_update_static_pass(store: &DynStore, dataset: &[Operation]) -> Result<(), String> {
+    for operation in dataset {
+        update!(
+            store,
+            b"row_static",
+            operation.key.as_slice(),
+            |value: &mut Vec<u8>| rewrite_row_rewards_to_zero(value)
+        )?;
+    }
+    Ok(())
+}
+
+fn run_partial_update_static_pass(store: &DynStore, dataset: &[Operation]) -> Result<(), String> {
+    for operation in dataset {
+        update!(
+            store,
+            b"row_static",
+            operation.key.as_slice(),
+            rewards,
+            |value: &mut [u8]| overwrite_reward_with_fixed_width_zero(value)
+        )?;
+    }
+    Ok(())
 }
 
 fn verify_full_values(

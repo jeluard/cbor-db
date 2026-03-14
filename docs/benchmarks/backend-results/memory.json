@@ -1,50 +1,45 @@
 {
   "backend": "memory",
-  "kind": "in-memory HashMap",
   "on_disk_bytes": null,
   "memory": {
-    "rss_before_bytes": 14729216,
-    "rss_peak_bytes": 19513344,
-    "rss_after_bytes": 19513344
+    "rss_before_bytes": 14876672,
+    "rss_peak_bytes": 20496384,
+    "rss_after_bytes": 20496384
   },
   "insert": {
     "operations": 4000,
     "elapsed_ms": 0,
-    "elapsed_us": 906,
-    "ops_per_sec": 4413997.66940923
+    "elapsed_us": 444,
+    "ops_per_sec": 9002478.862723026
   },
   "full_read": {
     "operations": 4000,
-    "elapsed_ms": 1,
-    "elapsed_us": 1091,
-    "ops_per_sec": 3664681.6307833255
+    "elapsed_ms": 0,
+    "elapsed_us": 619,
+    "ops_per_sec": 6453180.197939193
   },
   "partial_get_static": {
     "operations": 4000,
     "elapsed_ms": 0,
-    "elapsed_us": 846,
-    "ops_per_sec": 4728132.387706856
+    "elapsed_us": 479,
+    "ops_per_sec": 8343762.880367104
   },
   "full_update_static": {
     "operations": 4000,
-    "elapsed_ms": 2,
-    "elapsed_us": 2723,
-    "ops_per_sec": 1468698.3660730678
+    "elapsed_ms": 1,
+    "elapsed_us": 1831,
+    "ops_per_sec": 2183852.807889304
   },
   "partial_update_static": {
     "operations": 4000,
     "elapsed_ms": 0,
-    "elapsed_us": 657,
-    "ops_per_sec": 6088280.0608828
+    "elapsed_us": 383,
+    "ops_per_sec": 10434366.33074949
   },
   "delete": {
     "operations": 4000,
     "elapsed_ms": 0,
-    "elapsed_us": 539,
-    "ops_per_sec": 7419429.63134709
-  },
-  "notes": [
-    "Baseline only",
-    "No persistence cost"
-  ]
+    "elapsed_us": 338,
+    "ops_per_sec": 11828658.87574454
+  }
 }

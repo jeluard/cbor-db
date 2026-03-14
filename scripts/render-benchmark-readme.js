@@ -31,12 +31,12 @@ function main() {
 function renderReadmeSnapshot(report) {
   let markdown = "";
 
-  markdown += `Current benchmark snapshot (\`make bench\`, ${report.config.entries} \`Row\` values, ${report.config.key_size}-byte keys). Each backend is benchmarked in its own child process. The workload writes the full row, reads it back with full \`get!\`-equivalent retrieval into a Rust struct, reads only \`rewards\` through \`get!\`, updates \`rewards\` to 0 through either full deserialize/mutate/re-encode or direct CBOR rewrite, then deletes the entry. The table below shows the fixed-width \`row_static\` path-targeted variants and also tracks resident memory before the backend run, peak observed resident memory during the run, and resident memory after the backend run.\n\n`;
-  markdown += "| Backend | Insert | Full get! | Partial get! | Full update! | Partial update! | Delete | RSS before / peak / after |\n";
-  markdown += "| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |\n";
+  markdown += `Current benchmark snapshot (\`make bench\`, ${report.config.entries} \`Row\` values, ${report.config.key_size}-byte keys). Each backend is benchmarked in its own child process. The workload writes the full row, reads it back with full \`get!\`-equivalent retrieval into a Rust struct, reads only \`rewards\` through \`get!\`, updates \`rewards\` to 0 through either full deserialize/mutate/re-encode or direct CBOR rewrite, then deletes the entry. The table below shows the fixed-width \`row_static\` path-targeted variants, resident memory before the backend run, peak observed resident memory during the run, resident memory after the backend run, and the persisted raw store size after the baseline seeded workload.\n\n`;
+  markdown += "| Backend | Insert | Full get! | Partial get! | Full update! | Partial update! | Delete | RSS before / peak / after | Disk |\n";
+  markdown += "| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: |\n";
 
   for (const result of report.results) {
-    markdown += `| ${result.backend} | ${renderOps(result.insert.ops_per_sec)} | ${renderOps(result.full_read.ops_per_sec)} | ${renderOps(result.partial_get_static.ops_per_sec)} | ${renderOps(result.full_update_static.ops_per_sec)} | ${renderOps(result.partial_update_static.ops_per_sec)} | ${renderOps(result.delete.ops_per_sec)} | ${renderMibShort(result.memory.rss_before_bytes)} / ${renderMibShort(result.memory.rss_peak_bytes)} / ${renderMibShort(result.memory.rss_after_bytes)} |\n`;
+    markdown += `| ${result.backend} | ${renderOps(result.insert.ops_per_sec)} | ${renderOps(result.full_read.ops_per_sec)} | ${renderOps(result.partial_get_static.ops_per_sec)} | ${renderOps(result.full_update_static.ops_per_sec)} | ${renderOps(result.partial_update_static.ops_per_sec)} | ${renderOps(result.delete.ops_per_sec)} | ${renderMibShort(result.memory.rss_before_bytes)} / ${renderMibShort(result.memory.rss_peak_bytes)} / ${renderMibShort(result.memory.rss_after_bytes)} | ${renderDiskUsage(result.on_disk_bytes)} |\n`;
   }
 
   markdown += "\n### Backend Comparison Charts\n\n";
@@ -73,6 +73,22 @@ function renderReadmeChart(title, results, metric) {
 
 function renderMibShort(bytes) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MiB`;
+}
+
+function renderDiskUsage(bytes) {
+  if (bytes == null) {
+    return "n/a";
+  }
+  if (bytes >= 1024 * 1024 * 1024) {
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GiB`;
+  }
+  if (bytes >= 1024 * 1024) {
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MiB`;
+  }
+  if (bytes >= 1024) {
+    return `${Math.round(bytes / 1024)} KiB`;
+  }
+  return `${bytes} B`;
 }
 
 function renderOps(opsPerSec) {
